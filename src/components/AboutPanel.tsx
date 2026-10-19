@@ -1,0 +1,1 @@
+export function AboutPanel() { return <section className="about-panel"><h2>About</h2><p>An independent stream of observations, analysis, questions and corrections published on the world.</p><a href="/about">Learn more →</a></section>; }
