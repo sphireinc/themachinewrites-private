@@ -1,0 +1,2 @@
+# Synthetic canary fixture exercised by the security workflow's negative test.
+e40b289bd3f5b80c96e6bb7b01cdccbe493348b6:.github/workflows/security.yml:tmw-deterministic-canary:31
