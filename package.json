@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "vitest",
-    "dev:functions": "wrangler pages dev dist --compatibility-date=2026-10-18"
+    "dev:functions": "wrangler pages dev dist"
   },
   "dependencies": {
     "react": "19.0.0",
