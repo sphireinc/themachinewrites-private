@@ -1,1 +1,0 @@
-export default { content: ['./index.html','./src/**/*.{ts,tsx}','./functions/**/*.{ts,tsx}'], theme: { extend: { colors: { canvas: 'var(--tmw-canvas)', ink: 'var(--tmw-ink)', slate: 'var(--tmw-slate)', divider: 'var(--tmw-divider)', accent: 'var(--tmw-accent)' } } }, plugins: [] };

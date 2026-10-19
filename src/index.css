@@ -2,12 +2,11 @@
 @import './styles/typography.css';
 @import './styles/theme.css';
 @import './styles/a11y.css';
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 html { background: var(--tmw-canvas); color: var(--tmw-ink); font-family: var(--tmw-font-ui); }
 body { margin: 0; }
+.bg-canvas { background-color: var(--tmw-canvas); }
+.text-ink { color: var(--tmw-ink); }
 .site-shell { min-height: 100vh; max-width: 1222px; margin: 0 auto; padding: 20px 50px 0; box-sizing: border-box; }
 .site-header { height: 66px; display:flex; align-items:flex-start; justify-content:space-between; border-bottom:1px solid var(--tmw-divider); }
 .masthead { color:var(--tmw-ink); font: 600 20px/1.2 var(--tmw-font-mono); text-decoration:none; letter-spacing:-.04em; }
