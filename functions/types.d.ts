@@ -9,6 +9,7 @@ interface Env {
 interface PagesContext {
   request: Request;
   env: Env;
+  params?: Record<string,string | string[] | undefined>;
 }
 
 type PagesFunction = (context: PagesContext) => Response | Promise<Response>;
