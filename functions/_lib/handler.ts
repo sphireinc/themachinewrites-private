@@ -1,5 +1,6 @@
 import { errorResponse, GatewayError, methodNotAllowed } from './errors';
 import { fetchPublicContent, type PublicFetcher } from './publicContent';
+import { currentGatewayDependencies } from './dependencies';
 
 export interface HandlerDeps { fetcher?: PublicFetcher; now?: () => Date }
 
@@ -8,7 +9,7 @@ export async function guardedGet(request: Request, action: () => Promise<Respons
   try { return await action(); } catch (error) { return errorResponse(error); }
 }
 
-export async function fetchText(request: Request, env: Env, path: string, deps: HandlerDeps = {}): Promise<string> {
+export async function fetchText(request: Request, env: Env, path: string, deps: HandlerDeps = currentGatewayDependencies()): Promise<string> {
   if (request.method !== 'GET') throw new GatewayError(405, 'bad_request', 'Only GET requests are supported.');
   return (await fetchPublicContent(env, path, deps.fetcher)).text;
 }

@@ -61,15 +61,19 @@ function validateCard(value: unknown): FeedCard {
   const card=object(value), type=string(card.type); if(!TYPES.has(type)) throw invalid('invalid post type');
   if(!ULID.test(string(card.id))) throw invalid('invalid post ID'); const published=timestamp(card.published_at);
   if (decodeULIDDate(string(card.id)) !== published.slice(0,10)) throw invalid('post ID/date mismatch');
-  return {id:string(card.id),title:string(card.title),type:type as FeedCard['type'],excerpt:string(card.excerpt),published_at:published,topics:array(card.topics).map(string),reading_minutes:positive(card.reading_minutes),related_count:nonnegative(card.related_count)};
+  const title=boundedString(card.title,5,160), excerpt=boundedString(card.excerpt,1,500), topics=array(card.topics).map((topic)=>boundedString(topic,1,48));
+  if(topics.length<1||topics.length>12||new Set(topics).size!==topics.length)throw invalid('invalid topics');
+  const reading=positive(card.reading_minutes), related=nonnegative(card.related_count);
+  return {id:string(card.id),title,type:type as FeedCard['type'],excerpt,published_at:published,topics,reading_minutes:reading,related_count:related};
 }
 function assertOrdered(cards:FeedCard[]){for(let i=1;i<cards.length;i++){const a=cards[i-1],b=cards[i];if(a.published_at<b.published_at||(a.published_at===b.published_at&&a.id<b.id))throw invalid('posts are not sorted newest first');}}
 function decodeULIDDate(id:string){const alphabet='0123456789ABCDEFGHJKMNPQRSTVWXYZ';let value=0;for(const c of id.slice(0,10))value=value*32+alphabet.indexOf(c);return new Date(value).toISOString().slice(0,10);}
 function object(value:unknown):Record<string,unknown>{if(!value||typeof value!=='object'||Array.isArray(value))throw invalid('expected object');return value as Record<string,unknown>;}
 function array(value:unknown):unknown[]{if(!Array.isArray(value))throw invalid('expected array');return value;}
 function string(value:unknown):string{if(typeof value!=='string')throw invalid('expected string');return value;}
+function boundedString(value:unknown,min:number,max:number):string{const text=string(value);const length=[...text].length;if(length<min||length>max||text.includes('<')||text.includes('>')||text.includes('\r')||text.includes('\n'))throw invalid('string exceeds public bounds');return text;}
 function timestamp(value:unknown):string{const text=string(value);if(!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/.test(text)||Number.isNaN(Date.parse(text)))throw invalid('invalid timestamp');return text;}
 function nonnegative(value:unknown):number{if(typeof value!=='number'||!Number.isInteger(value)||value<0)throw invalid('expected nonnegative integer');return value;}
 function positive(value:unknown):number{const n=nonnegative(value);if(n===0)throw invalid('expected positive integer');return n;}
 function requireVersion(record:Record<string,unknown>){if(record.schema_version!==1)throw invalid('unsupported schema version');}
-function invalid(message:string){return new GatewayError(502,'bad_gateway',message,false);}
+function invalid(message:string):never{throw new GatewayError(502,'bad_gateway',message,false);}

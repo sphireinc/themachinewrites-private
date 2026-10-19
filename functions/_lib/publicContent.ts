@@ -13,7 +13,7 @@ export type PublicFetcher = (input: RequestInfo | URL, init?: RequestInit) => Pr
 export function configuredOrigin(env: Env): URL {
   const raw = env.PUBLIC_CONTENT_ORIGIN ?? 'https://raw.githubusercontent.com';
   const parsed = new URL(raw);
-  if (parsed.protocol !== 'https:' || parsed.username || parsed.password) {
+  if (parsed.protocol !== 'https:' || parsed.port || parsed.username || parsed.password || parsed.search || parsed.hash) {
     throw new GatewayError(503, 'service_unavailable', 'Public content origin is misconfigured.', false);
   }
   parsed.pathname = parsed.pathname.replace(/\/+$/, '');
@@ -23,7 +23,7 @@ export function configuredOrigin(env: Env): URL {
 }
 
 export function publicContentURL(env: Env, path: string): URL {
-  if (!path || path.length > MAX_PATH_LENGTH || path.startsWith('/') || path.includes('\\') || path.includes('..') || path.includes('\0')) {
+  if (!path || path.length > MAX_PATH_LENGTH || path.startsWith('/') || path.includes('\\') || path.includes('..') || path.includes('\0') || path.split('/').some((segment) => !segment || segment === '.')) {
     throw new GatewayError(500, 'bad_gateway', 'Invalid public content path.', false);
   }
   const owner = required(env.PUBLIC_CONTENT_OWNER, 'owner');
