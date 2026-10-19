@@ -35,8 +35,8 @@ describe('edge cache behavior', () => {
   });
   it('article cache remains immutable and query-independent',async()=>{
     const cache=new MemoryCache(); let calls=0;
-    const a=await withEdgeCache(env,cache,'https://themachinewrites.com/api/posts/01M58D0W400000000000000000',async()=>{calls++;return new Response('body',{headers:{'Cache-Control':'public, max-age=31536000, immutable'}});});
+    const a=await withEdgeCache(env,cache,'https://themachinewrites.com/api/posts/01M58D0W400000000000000000',async()=>{calls++;return new Response('body',{headers:{'Cache-Control':'public, max-age=31536000, immutable'}});},true,true);
     const b=await withEdgeCache(env,cache,'https://themachinewrites.com/api/posts/01M58D0W400000000000000000',async()=>{calls++;return new Response('changed');});
-    expect(calls).toBe(1); expect(await a.text()).toBe('body'); expect(await b.text()).toBe('body');
+    expect(calls).toBe(1); expect(a.headers.get('Cache-Control')).toContain('immutable'); expect(await a.text()).toBe('body'); expect(await b.text()).toBe('body');
   });
 });

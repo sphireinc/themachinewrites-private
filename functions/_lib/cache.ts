@@ -24,6 +24,7 @@ export async function withEdgeCache(
   key: string,
   build: () => Promise<Response>,
   cacheable = true,
+  immutable = false,
 ): Promise<Response> {
   if (!cacheable || !cache) return build();
   const hit = await cache.match(key);
@@ -31,7 +32,8 @@ export async function withEdgeCache(
   const response = await build();
   if (response.ok) {
     const copy = response.clone();
-    copy.headers.set('Cache-Control', `public, max-age=${cacheSeconds(env)}, s-maxage=${cacheSeconds(env)}`);
+    if (immutable) copy.headers.set('Cache-Control', 'public, max-age=31536000, immutable');
+    else copy.headers.set('Cache-Control', `public, max-age=${cacheSeconds(env)}, s-maxage=${cacheSeconds(env)}`);
     await cache.put(key, copy);
   }
   return response;

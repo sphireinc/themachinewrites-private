@@ -9,7 +9,7 @@ export const onRequest: PagesFunction = async ({ request, env, params }) => guar
   return withEdgeCache(env, activeEdgeCache(), new URL(request.url).origin+`/api/posts/${id}`, async () => {
     const payload = await fetchText(request, env, path);
     return new Response(JSON.stringify({ id, body_markdown: payload }), { headers: { 'Cache-Control': 'public, max-age=31536000, immutable', 'Content-Type': 'application/json; charset=utf-8' } });
-  });
+  }, true, true);
 });
 
 function ulidDate(id: string): string {
