@@ -6,6 +6,4 @@ html, body { background: var(--tmw-canvas); color: var(--tmw-ink); }
 a { color: var(--tmw-accent); }
 :focus-visible { outline: 2px solid var(--tmw-accent); outline-offset: 3px; }
 
-.dark {
-  color-scheme: dark;
-}
+.dark { color-scheme: dark; }

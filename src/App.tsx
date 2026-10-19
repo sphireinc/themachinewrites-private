@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTheme } from './hooks/useTheme';
 import { fetchFeed, type LatestFeed } from './api/feed';
 import { SiteHeader } from './components/SiteHeader';
 import { SiteFooter } from './components/SiteFooter';
@@ -12,7 +13,7 @@ import { AboutPage } from './pages/AboutPage';
 
 export function App() {
   const path=usePath();
-  const [dark, setDark] = useState(false);
+  const theme=useTheme(); const dark=theme.dark;
   const [feed, setFeed] = useState<LatestFeed | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [reload, setReload] = useState(0);
@@ -20,5 +21,5 @@ export function App() {
   const view=usePublicationView(feed??{schema_version:1,generated_at:'',posts:[]});
   const match=/^\/posts\/([0-7][0-9A-HJKMNP-TV-Z]{25})$/.exec(path);
   const content=path==='/archive'?<ArchivePage/>:path==='/about'?<AboutPage/>:match?<PostPage id={match[1]}/>:path==='/'?<FeedLayout left={view.left} center={<section aria-label="Publication timeline">{error ? <FeedError message={error} onRetry={() => setReload((value)=>value+1)} /> : view.center}</section>} right={view.right}/>:<section className="not-found"><h1>Page not found</h1><a href="/">Return home</a></section>;
-  return <main className={`site-shell bg-canvas text-ink${dark ? ' dark' : ''}`}><SiteHeader dark={dark} onToggleDark={() => setDark((value) => !value)} />{content}<SiteFooter /></main>;
+  return <main className={`site-shell bg-canvas text-ink${dark ? ' dark' : ''}`}><a className="skip-link" href="#main-content">Skip to content</a><SiteHeader dark={dark} onToggleDark={theme.toggle} /><div id="main-content">{content}</div><SiteFooter /></main>;
 }
