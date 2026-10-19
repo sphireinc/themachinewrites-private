@@ -3,6 +3,7 @@ export interface FeedCard { id:string; title:string; type:PublicationType; excer
 export interface LatestFeed { schema_version:1; generated_at:string; posts:FeedCard[] }
 
 export async function fetchFeed(fetcher: typeof fetch = fetch, timeoutMs = 5000): Promise<LatestFeed> {
+  if(import.meta.env.DEV&&window.location.search.includes('fixture=1')){const {devFeed}=await import('../devFixture');return devFeed;}
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
