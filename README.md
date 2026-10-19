@@ -8,6 +8,8 @@ When this repository is checked out in the shared project workspace, the sibling
 
 ## Local development
 
-Use Node 20 for the supported lint/toolchain runtime. Run `npm ci`, `npm run typecheck`, `npm run build`, `npm run lint`, and `npm test -- --run`. Copy `.dev.vars.example` to the ignored `.dev.vars`, then run `npm run dev` for the Vite frontend and `npm run dev:functions` for the Pages Functions runtime.
+Use Node 22 for the supported lint/toolchain runtime. Run `npm ci`, `npm run typecheck`, `npm run build`, `npm run lint`, and `npm test -- --run`. Copy `.dev.vars.example` to the ignored `.dev.vars`, then run `npm run dev` for the Vite frontend and `npm run dev:functions` for the Pages Functions runtime.
 
 Pages Functions read public content only and require no credential. See `docs/CLOUDFLARE-CONFIG.md`.
+Cloudflare build settings and repository connection are documented in `docs/DEPLOY.md`; custom
+domain and TLS procedure is in `docs/DOMAIN.md`.
