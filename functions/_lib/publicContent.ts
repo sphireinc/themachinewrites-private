@@ -6,6 +6,13 @@ export interface PublicContentResponse {
   text: string;
   etag: string | null;
   lastModified: string | null;
+  notModified?: boolean;
+}
+
+export interface StoredPublicContent {
+  text: string;
+  etag: string | null;
+  lastModified: string | null;
 }
 
 export type PublicFetcher = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
@@ -51,6 +58,7 @@ export async function fetchPublicContent(
       signal: controller.signal,
       headers: { Accept: 'application/json, text/markdown, text/plain' },
     });
+    if (response.status === 304) throw new GatewayError(304, 'not_found', 'Origin content is unchanged.', false);
     if (response.status === 404) throw new GatewayError(404, 'not_found', 'Publication not found.', false);
     if (response.status === 429) throw new GatewayError(503, 'service_unavailable', 'The public archive is temporarily busy.', true);
     if (response.status >= 500) throw new GatewayError(503, 'service_unavailable', 'The public archive is temporarily unavailable.', true);
@@ -70,6 +78,23 @@ export async function fetchPublicContent(
     throw new GatewayError(503, 'service_unavailable', 'The public archive is temporarily unavailable.', true, error);
   } finally {
     clearTimeout(timer);
+  }
+}
+
+export async function fetchPublicContentWithCache(
+  env: Env,
+  path: string,
+  previous: StoredPublicContent | undefined,
+  fetcher: PublicFetcher = fetch,
+  timeoutMs = 5_000,
+  maxBytes = 512 * 1024,
+): Promise<PublicContentResponse> {
+  try { return await fetchPublicContent(env, path, fetcher, timeoutMs, maxBytes); }
+  catch (error) {
+    if (error instanceof GatewayError && error.status === 304 && previous) {
+      return { ...previous, notModified: true } as PublicContentResponse;
+    }
+    throw error;
   }
 }
 

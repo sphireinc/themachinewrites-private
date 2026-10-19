@@ -1,12 +1,15 @@
 import { guardedGet, fetchText } from '../../_lib/handler';
 import { isULID } from '../../_lib/validate';
+import { activeEdgeCache, withEdgeCache } from '../../_lib/cache';
 
 export const onRequest: PagesFunction = async ({ request, env, params }) => guardedGet(request, async () => {
   const id = Array.isArray(params?.id) ? params.id[0] : params?.id;
   if (!id || !isULID(id)) return Response.json({ error: 'bad_request', message: 'post ID must be a ULID.' }, { status: 400, headers: { 'Cache-Control': 'no-store' } });
   const date = ulidDate(id); const path = `posts/${date.slice(0,4)}/${date.slice(5,7)}/${date.slice(8,10)}/${id}.md`;
-  const payload = await fetchText(request, env, path);
-  return new Response(JSON.stringify({ id, body_markdown: payload }), { headers: { 'Cache-Control': 'public, max-age=31536000, immutable', 'Content-Type': 'application/json; charset=utf-8' } });
+  return withEdgeCache(env, activeEdgeCache(), new URL(request.url).origin+`/api/posts/${id}`, async () => {
+    const payload = await fetchText(request, env, path);
+    return new Response(JSON.stringify({ id, body_markdown: payload }), { headers: { 'Cache-Control': 'public, max-age=31536000, immutable', 'Content-Type': 'application/json; charset=utf-8' } });
+  });
 });
 
 function ulidDate(id: string): string {
