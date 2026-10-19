@@ -4,10 +4,15 @@ import { describe, expect, it } from 'vitest';
 describe('website CI security policy', () => {
   const workflow = readFileSync('.github/workflows/security.yml', 'utf8');
   const ci = readFileSync('.github/workflows/ci.yml', 'utf8');
+  const gitleaksConfig = readFileSync('.gitleaks.toml', 'utf8');
 
   it('uses read-only contents permissions and high-severity dependency review', () => {
     expect(workflow).toMatch(/permissions:\n\s+contents: read/);
-    expect(workflow).toContain('gitleaks/gitleaks-action@v2');
+    expect(workflow).toMatch(/docker:\/\/ghcr\.io\/gitleaks\/gitleaks:v8\.30\.1@sha256:[a-f0-9]{64}/);
+    expect(workflow).toContain('args: git --redact --config .gitleaks.toml .');
+    expect(workflow).not.toContain('gitleaks/gitleaks-action');
+    expect(gitleaksConfig).toMatch(/\[extend\]\s*useDefault = true/);
+    expect(workflow).toContain('tmw-deterministic-canary');
     expect(workflow).toContain('actions/dependency-review-action@v4');
     expect(workflow).toContain('fail-on-severity: high');
     expect(workflow).toContain('npm audit --audit-level=high');
