@@ -1,2 +1,4 @@
-export interface PostResponse { id:string; body_markdown:string }
-export async function fetchPost(id:string,fetcher:typeof fetch=fetch):Promise<PostResponse>{const response=await fetcher(`/api/posts/${encodeURIComponent(id)}`);if(!response.ok)throw new Error(`Post request failed (${response.status})`);const value=await response.json();if(!value||typeof value.id!=='string'||typeof value.body_markdown!=='string')throw new Error('Invalid post response');return value;}
+export interface PostSource { title:string;url:string;retrieved_at:string }
+export interface PostMetadata { schema_version:1;id:string;title:string;type:string;published_at:string;topics:string[];sources:PostSource[];related_ids:string[];correction_of:string|null;model_identifier:string;prompt_version:string }
+export interface PostResponse { id:string; metadata:PostMetadata; body_markdown:string }
+export async function fetchPost(id:string,fetcher:typeof fetch=fetch):Promise<PostResponse>{const response=await fetcher(`/api/posts/${encodeURIComponent(id)}`);if(!response.ok)throw new Error(`Post request failed (${response.status})`);const value=await response.json();if(!value||typeof value.id!=='string'||!value.metadata||typeof value.body_markdown!=='string')throw new Error('Invalid post response');return value;}
