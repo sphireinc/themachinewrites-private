@@ -1,0 +1,39 @@
+{
+  "name": "themachinewrites-private",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "engines": { "node": ">=18.18" },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest",
+    "dev:functions": "wrangler pages dev dist --compatibility-date=2026-10-18"
+  },
+  "dependencies": {
+    "react": "19.0.0",
+    "react-dom": "19.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "8.57.1",
+    "@testing-library/jest-dom": "6.6.3",
+    "@testing-library/react": "16.2.0",
+    "@types/react": "19.0.14",
+    "@types/react-dom": "19.0.6",
+    "@typescript-eslint/eslint-plugin": "7.18.0",
+    "@typescript-eslint/parser": "7.18.0",
+    "@vitejs/plugin-react": "4.7.0",
+    "autoprefixer": "10.4.21",
+    "eslint": "8.57.1",
+    "globals": "16.0.0",
+    "jsdom": "26.0.0",
+    "postcss": "8.5.6",
+    "tailwindcss": "3.4.17",
+    "typescript": "5.7.3",
+    "vite": "5.4.21",
+    "vitest": "2.1.9",
+    "wrangler": "3.114.13"
+  }
+}
