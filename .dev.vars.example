@@ -1,0 +1,5 @@
+PUBLIC_CONTENT_OWNER=replace-with-public-repository-owner
+PUBLIC_CONTENT_REPO=themachinewrites-public
+PUBLIC_CONTENT_BRANCH=main
+PUBLIC_CONTENT_ORIGIN=https://raw.githubusercontent.com
+FEED_CACHE_SECONDS=60

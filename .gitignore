@@ -11,6 +11,7 @@ dist/
 .dev.vars*
 !.dev.vars.example
 .wrangler/
+/.serena/
 
 # Test output and local editor files
 coverage/
