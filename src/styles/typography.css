@@ -1,0 +1,13 @@
+:root {
+  --tmw-type-masthead: 600 20px/1.2 var(--tmw-font-mono);
+  --tmw-type-nav: 400 13px/1.35 var(--tmw-font-ui);
+  --tmw-type-headline: 500 21px/1.28 var(--tmw-font-editorial);
+  --tmw-type-body: 400 14px/1.55 var(--tmw-font-ui);
+  --tmw-type-meta: 400 10px/1.3 var(--tmw-font-mono);
+}
+
+.masthead { font: var(--tmw-type-masthead); }
+.primary-nav { font: var(--tmw-type-nav); }
+.publication-title { font: var(--tmw-type-headline); }
+.publication-excerpt { font: var(--tmw-type-body); }
+.publication-meta { font: var(--tmw-type-meta); }
