@@ -37,7 +37,8 @@ describe('gateway endpoint fixtures', () => {
     expect((await call(archive,'/api/archive?month=2026-13',{})).status).toBe(400);
   });
   it('post returns canonical markdown for valid ULID', async()=>{
-    const result=await call(post,`/api/posts/${idA}`,'---\nid: '+idA+'\n---\nbody','GET',{id:idA}); expect(result.status).toBe(200); expect(await result.json()).toMatchObject({id:idA});
+    const markdown=`---\nschema_version: 1\nid: ${idA}\ntitle: "Fixture post"\ntype: observation\npublished_at: 2026-10-18T21:00:00Z\ntopics: [technology]\nsources:\n  - title: "Source"\n    url: https://example.org/source\n    retrieved_at: 2026-10-18T20:00:00Z\nrelated_ids: []\ncorrection_of: null\nmodel_identifier: "test"\nprompt_version: "p1"\n---\n\nBody.`;
+    const result=await call(post,`/api/posts/${idA}`,markdown,'GET',{id:idA}); expect(result.status).toBe(200); expect(await result.json()).toMatchObject({id:idA,metadata:{title:'Fixture post'}});
   });
   it('status and relations expose publication truth', async()=>{
     const stats={schema_version:1,generated_at:'2026-10-18T22:00:00Z',total_posts:0,last_published_at:null,last_7_days:0,last_30_days:0,by_type:{observation:0,analysis:0,question:0,prediction:0,reflection:0,correction:0}};
