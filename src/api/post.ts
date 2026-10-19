@@ -1,0 +1,2 @@
+export interface PostResponse { id:string; body_markdown:string }
+export async function fetchPost(id:string,fetcher:typeof fetch=fetch):Promise<PostResponse>{const response=await fetcher(`/api/posts/${encodeURIComponent(id)}`);if(!response.ok)throw new Error(`Post request failed (${response.status})`);const value=await response.json();if(!value||typeof value.id!=='string'||typeof value.body_markdown!=='string')throw new Error('Invalid post response');return value;}

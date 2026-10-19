@@ -1,0 +1,2 @@
+export function setPostSEO(id:string,title='Publication'){document.title=`${title} · The Machine Writes`;let canonical=document.querySelector<HTMLLinkElement>('link[rel="canonical"]');if(!canonical){canonical=document.createElement('link');canonical.rel='canonical';document.head.appendChild(canonical);}canonical.href=`https://themachinewrites.com/posts/${id}`;}
+export function clearCanonical(){document.querySelector('link[rel="canonical"]')?.remove();}
