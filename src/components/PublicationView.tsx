@@ -6,11 +6,12 @@ import { TopicFilters } from './TopicFilters';
 import { topicLabels } from '../utils/topics';
 import { AboutPanel } from './AboutPanel';
 import { deriveStats, LastActivity } from './LastActivity';
+import { MobileFilters } from './MobileFilters';
 
 export function usePublicationView(feed:LatestFeed) {
   const [category,setCategory]=useState<Category>('all'); const [topic,setTopic]=useState<string|null>(null);
   const visible=useMemo(()=>filterByCategory(feed.posts,category).filter((post)=>!topic||post.topics.includes(topic)),[feed.posts,category,topic]);
-  return {left:<CategoryFilters value={category} onChange={setCategory}/>,center:<Timeline posts={visible}/>,right:<><LastActivity stats={deriveStats(feed.posts)}/><TopicFilters topics={topicLabels(feed.posts)} selected={topic} onToggle={(value)=>setTopic((current)=>current===value?null:value)}/><AboutPanel/></>};
+  return {left:<><CategoryFilters value={category} onChange={setCategory}/><MobileFilters value={category} onChange={setCategory}/></>,center:<Timeline posts={visible}/>,right:<><LastActivity stats={deriveStats(feed.posts)}/><TopicFilters topics={topicLabels(feed.posts)} selected={topic} onToggle={(value)=>setTopic((current)=>current===value?null:value)}/><AboutPanel/></>};
 }
 
 export function PublicationView({ feed }: { feed:LatestFeed }) {
