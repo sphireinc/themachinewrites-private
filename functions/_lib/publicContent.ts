@@ -54,11 +54,12 @@ export async function fetchPublicContent(
   try {
     const response = await fetcher(publicContentURL(env, path), {
       method: 'GET',
-      redirect: 'error',
+      redirect: 'manual',
       signal: controller.signal,
       headers: { Accept: 'application/json, text/markdown, text/plain' },
     });
     if (response.status === 304) throw new GatewayError(304, 'not_found', 'Origin content is unchanged.', false);
+    if (response.status >= 300 && response.status < 400) throw new GatewayError(502, 'bad_gateway', 'The public archive returned an unexpected redirect.', false);
     if (response.status === 404) throw new GatewayError(404, 'not_found', 'Publication not found.', false);
     if (response.status === 429) throw new GatewayError(503, 'service_unavailable', 'The public archive is temporarily busy.', true);
     if (response.status >= 500) throw new GatewayError(503, 'service_unavailable', 'The public archive is temporarily unavailable.', true);
