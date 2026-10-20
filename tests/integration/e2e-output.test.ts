@@ -17,9 +17,11 @@ describe.runIf(root)('published E2E artifact through website gateway', () => {
     const id = card.id;
     const canonicalPath = readFileSync(join(root!, 'post-path.txt'), 'utf8');
     const postMarkdown = readFileSync(join(root!, canonicalPath), 'utf8');
+    const requested: string[] = [];
     const env: Env = { PUBLIC_CONTENT_OWNER: 'fixture', PUBLIC_CONTENT_REPO: 'public', PUBLIC_CONTENT_BRANCH: 'main', PUBLIC_CONTENT_ORIGIN: 'https://raw.githubusercontent.com', FEED_CACHE_SECONDS: '60' };
     configureGatewayForTests({ fetcher: async (input) => {
       const path = new URL(String(input)).pathname;
+      requested.push(path);
       return path.endsWith('/feed/latest.json') ? new Response(latest, { status: 200 }) : new Response(postMarkdown, { status: 200 });
     } });
     try {
@@ -32,6 +34,7 @@ describe.runIf(root)('published E2E artifact through website gateway', () => {
       const postBody = await postResponse.json() as { metadata: { id: string }; body_markdown: string };
       expect(postBody.metadata.id).toBe(id);
       expect(postBody.body_markdown).toContain('The cited fixture contains a factual observation.');
+      expect(requested.some((path) => path.endsWith(`/${canonicalPath}`))).toBe(true);
     } finally {
       configureGatewayForTests({});
     }
