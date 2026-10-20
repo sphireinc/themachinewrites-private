@@ -17,10 +17,15 @@ website builds.
 | Build output directory | `dist` |
 | Node version | `22` |
 | Wrangler config | repository `wrangler.jsonc` |
+| Deploy command | Leave unset for Git integration; Pages deploys the build output automatically |
 
 `npm ci` uses the committed lockfile. The build emits static assets and copies `public/_headers`
 to `dist/_headers`; `functions/_middleware.ts` applies security headers to all Function responses.
 Preview builds are acceptable only for reviewed branches; production deploys `main`.
+Pages branch previews are controlled by the Pages project's branch deployment settings. Do not set
+the Workers-only `preview_urls` property in `wrangler.jsonc`; Wrangler rejects it when validating a
+Pages project. Git integration deploys pushes to `main` as production and enabled non-production
+branches as previews.
 
 ## Public-content variables
 
