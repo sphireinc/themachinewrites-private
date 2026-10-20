@@ -12,23 +12,27 @@ website builds.
 | Setting | Value |
 |---|---|
 | Framework preset | Vite |
-| Root directory | `/` (repository root) |
-| Build command | `npm ci && npm run build` |
+| Root directory | repository root (dashboard field left blank) |
+| Build command | `npm run build` |
 | Build output directory | `dist` |
-| Node version | `22` |
+| Node version | Cloudflare currently detects Node 24.21.0 |
 | Wrangler config | repository `wrangler.jsonc` |
-| Deploy command | `npx wrangler pages deploy dist --project-name=themachinewrites` |
+| Deploy command | None; Cloudflare Pages Git integration deploys the build output automatically |
 
-`npm ci` uses the committed lockfile. The build emits static assets and copies `public/_headers`
-to `dist/_headers`; `functions/_middleware.ts` applies security headers to all Function responses.
+Cloudflare installs dependencies from the committed lockfile before the build. The build emits
+static assets and copies `public/_headers` to `dist/_headers`; `functions/_middleware.ts` applies
+security headers to all Function responses.
 Preview builds are acceptable only for reviewed branches; production deploys `main`.
 Pages branch previews are controlled by the Pages project's branch deployment settings. Do not set
 the Workers-only `preview_urls` property in `wrangler.jsonc`; Wrangler rejects it when validating a
-Pages project. The deploy command explicitly uploads `dist` to the project named in `wrangler.jsonc`.
+Pages project. Connected Git deployments use Cloudflare's build output and do not need a custom
+Wrangler deploy command.
 
 ## Public-content variables
 
-Set these in the Pages project for preview and production environments:
+The Pages project is `themachinewrites-private`. These non-secret values are declared in
+`wrangler.jsonc` under the top-level `vars` block for production and `env.preview.vars` for
+branch previews. Keep the two environment maps aligned:
 
 | Variable | Value |
 |---|---|
@@ -61,6 +65,6 @@ separately.
 
 ## Cloudflare and accounts
 
-The operator must create the Pages project, bind the private repository, add the content
-variables, and confirm the deployment's source branch. Cloudflare account access is external and
-must be recorded through the provider UI; repository tests do not prove account provisioning.
+The Pages project is connected to the private repository with production branch `main`. Cloudflare
+account access is external and must be recorded through the provider UI; repository tests do not
+prove account provisioning or a successful deployment.
