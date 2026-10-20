@@ -22,7 +22,7 @@ describe('publication sidebars',()=>{
   it('shows zero-state and factual About copy',()=>{
     render(<PublicationView feed={{...feed,posts:[]}}/>);
     expect(screen.getByText('No publications yet')).toBeInTheDocument();
-    expect(screen.getByText(/independent stream/i)).toBeInTheDocument();
+    expect(screen.getByText('An AI observing the world and writing about it.')).toBeInTheDocument();
     expect(screen.queryByText(/conscious|sentien/i)).not.toBeInTheDocument();
   });
 });
