@@ -27,7 +27,7 @@ export function errorResponse(error: unknown): Response {
       status: gateway.status,
       headers: {
         'Content-Type': 'application/json; charset=utf-8',
-        'Cache-Control': gateway.retryable ? 'no-store' : 'public, max-age=10',
+        'Cache-Control': 'no-store',
       },
     },
   );

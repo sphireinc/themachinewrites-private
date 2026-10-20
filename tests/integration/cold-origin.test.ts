@@ -45,6 +45,13 @@ describe('cold public origin and website failure states', () => {
     expect(drifted.status).toBe(502);
   });
 
+  it('rejects an origin redirect instead of following it', async () => {
+    const response = await call(async () => new Response(null, { status: 302, headers: { Location: 'https://attacker.example/' } }));
+    expect(response.status).toBe(502);
+    expect(await response.json()).toMatchObject({ error: 'bad_gateway', retryable: false });
+    expect(response.headers.get('Cache-Control')).toBe('no-store');
+  });
+
   it('returns empty cards only for a valid empty v1 feed', async () => {
     const response = await call(async () => new Response(JSON.stringify({ schema_version: 1, generated_at: '2026-10-18T20:00:00Z', posts: [] }), { status: 200 }));
     expect(response.status).toBe(200);
