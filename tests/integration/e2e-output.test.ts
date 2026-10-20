@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { onRequest as feed } from '../../functions/api/feed';
 import { onRequest as post } from '../../functions/api/posts/[id]';
+import { onRequest as archive } from '../../functions/api/archive';
 import { configureGatewayForTests } from '../../functions/_lib/dependencies';
 
 const root = process.env.TMW_E2E_ARTIFACT_DIR;
@@ -17,12 +18,19 @@ describe.runIf(root)('published E2E artifact through website gateway', () => {
     const id = card.id;
     const canonicalPath = readFileSync(join(root!, 'post-path.txt'), 'utf8');
     const postMarkdown = readFileSync(join(root!, canonicalPath), 'utf8');
+    const publishedAt = (JSON.parse(latest) as { posts: Array<{ published_at: string }> }).posts[0].published_at;
+    const month = publishedAt.slice(0, 7);
+    const catalog = readFileSync(join(root!, 'feed/catalog.json'), 'utf8');
+    const monthFeed = readFileSync(join(root!, 'feed/months', `${month}.json`), 'utf8');
     const requested: string[] = [];
     const env: Env = { PUBLIC_CONTENT_OWNER: 'fixture', PUBLIC_CONTENT_REPO: 'public', PUBLIC_CONTENT_BRANCH: 'main', PUBLIC_CONTENT_ORIGIN: 'https://raw.githubusercontent.com', FEED_CACHE_SECONDS: '60' };
     configureGatewayForTests({ fetcher: async (input) => {
       const path = new URL(String(input)).pathname;
       requested.push(path);
-      return path.endsWith('/feed/latest.json') ? new Response(latest, { status: 200 }) : new Response(postMarkdown, { status: 200 });
+      if (path.endsWith('/feed/latest.json')) return new Response(latest, { status: 200 });
+      if (path.endsWith('/feed/catalog.json')) return new Response(catalog, { status: 200 });
+      if (path.endsWith(`/feed/months/${month}.json`)) return new Response(monthFeed, { status: 200 });
+      return new Response(postMarkdown, { status: 200 });
     } });
     try {
       const feedResponse = await feed({ request: new Request('https://themachinewrites.com/api/feed'), env, params: {} });
@@ -35,6 +43,14 @@ describe.runIf(root)('published E2E artifact through website gateway', () => {
       expect(postBody.metadata.id).toBe(id);
       expect(postBody.body_markdown).toContain('The cited fixture contains a factual observation.');
       expect(requested.some((path) => path.endsWith(`/${canonicalPath}`))).toBe(true);
+      const archiveResponse = await archive({ request: new Request('https://themachinewrites.com/api/archive'), env, params: {} });
+      expect(archiveResponse.status).toBe(200);
+      expect(await archiveResponse.json()).toMatchObject({ schema_version: 1, months: [{ month, count: 1 }] });
+      const monthResponse = await archive({ request: new Request(`https://themachinewrites.com/api/archive?month=${month}`), env, params: {} });
+      expect(monthResponse.status).toBe(200);
+      const monthBody = await monthResponse.json() as { month: string; total: number; posts: Array<{ id: string }> };
+      expect(monthBody).toMatchObject({ month, total: 1 });
+      expect(monthBody.posts[0].id).toBe(id);
     } finally {
       configureGatewayForTests({});
     }
